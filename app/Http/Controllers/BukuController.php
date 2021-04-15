@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\BukuRepository;
+use App\Repositories\BukuRepository;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Session;
@@ -18,9 +18,9 @@ class BukuController extends Controller
         session()->reflash('status');
     }
     
-    public function index()
+    public function index(Request $request)
     {
         $results =  $this->listrepo->getBuku();
-        return view('listing-buku', compact('results'));
+        return view('listing-buku', compact('results', 'filters'));
     }
 }

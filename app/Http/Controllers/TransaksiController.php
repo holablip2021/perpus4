@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\TransaksiRepository;
-use App\RakRepository;
-use App\BukuRepository;
-use App\CrudTransaksiServices;
+use App\Repositories\TransaksiRepository;
+use App\Repositories\RakRepository;
+use App\Repositories\BukuRepository;
+use App\Services\CrudTransaksiServices;
 
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
@@ -34,19 +34,19 @@ class TransaksiController extends Controller
 
     public function cekStok($id = null){
         $results = $this->transaksiServices->stok($id);
+        session()->flash('status', $results['pesan']);
         if(!$results){
         return redirect()->back();    
         }
-        session()->flash('status', $results['pesan']);
         return view('order', compact('results'));
     }
 
-    public function order($id = null,Request $request){
-        $results = $this->transaksiServices->memberOrder($id,$request);
+    public function order(Request $request, $id = null){
+        $results = $this->transaksiServices->memberOrder($request, $id, 'PESAN');
+        session()->flash('status', $results['pesan']);
         if (!$results) {
             return redirect()->back();
         }
-        session()->flash('status', $results['pesan']);
         return redirect(url('/produk/list'));
     }    
 
@@ -58,12 +58,12 @@ class TransaksiController extends Controller
     }
 
     //transaksi keluar
-    public function keluar($id = null,Request $request){
-        $results = $this->transaksiServices->updateTransaksiKeluar($id, $request);
+    public function keluar(Request $request, $id = null){
+        $results = $this->transaksiServices->updateTransaksiKeluar($request,$id, 'KELUAR');
+        session()->flash('status', $results['pesan']);
         if (!$results) {
             return redirect()->back();
         }
-        session()->flash('status', $results['pesan']);
         return redirect(url('/pesanan/list'));
     }
 
@@ -74,9 +74,9 @@ class TransaksiController extends Controller
     }
 
     //transaksi masuk
-    public function masuk($id = null, Request $request)
+    public function masuk(Request $request,$id = null)
     {
-        $results = $this->transaksiServices->updateTransaksiMasuk($id, $request);
+        $results = $this->transaksiServices->updateTransaksiMasuk($request,$id, 'SELESAI');
         if (!$results) {
             return redirect()->back();
         }
@@ -92,10 +92,10 @@ class TransaksiController extends Controller
     }
 
     public function adjustmentMasuk(Request $request){
-        $results = $this->transaksiServices->transaksiPenyesuaian($request);
+        $results = $this->transaksiServices->transaksiPenyesuaian($request, 'MASUK');
         session()->flash('status', $results['pesan']); 
         if(!$results){
-            return redirect(url('/penyesuaian'));
+            return redirect()->back();
         }
         return redirect(url('/penyesuaian'));
     }    
