@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\UsersRepository;
-use App\CrudUsersServices;
+use App\Repositories\UsersRepository;
+use App\Services\CrudUsersServices;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Session;
@@ -35,10 +35,10 @@ class UsersController extends Controller
     public function cekLogin(Request $request)
     {
         $results = $this->userServices->validasi_user($request->post());
+        session()->flash('status', $results['pesan']);
         if (!$results) {
             return redirect(url('/pengguna/login'));
         }
-        session()->flash('status', $results['pesan']);
         return redirect('/');
     }    
 
@@ -51,10 +51,10 @@ class UsersController extends Controller
     public function registrasi(Request $request)
     {   
         $results = $this->userServices->create($request);
+        session()->flash('status', $results['pesan']);
         if (!$results) {
             return redirect()->back();
         }
-        session()->flash('status', $results['pesan']);
         return view('login',compact('results'));
     }
 
